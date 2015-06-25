@@ -3,6 +3,8 @@
 #include <string>
 #include <ios>
 #include <sstream>
+#include <iomanip>
+#include <utility>
 
 void DataStream::setInfinite() {
     isInfinite = true;
@@ -73,7 +75,7 @@ std::string DataStream::getAsciiString() const {
 std::string DataStream::getHexString() const {
     std::stringstream stream;
     for(const unsigned char &c : data) {
-        stream << std::hex << (int) c;
+        stream << std::setfill('0') << std::setw(2) << std::hex << (int) c;
     }
     return stream.str();
 }
@@ -113,17 +115,21 @@ std::string DataStream::getBase64String() const {
 
 std::string DataStream::getBinaryString() const {
     std::string answer;
-
+    for(unsigned char c : data) {
+        for(int i = 0; i < 8; i++) {
+            answer.push_back(((c << (7-i))&1)?'1':'0');
+        }
+    }
     return answer;
 }
 
 DataStream DataStream::operator^(const DataStream &other) const {
-    int min = 0;
+    unsigned int min = -1;
     if(!isInfinite) {
         min = data.size();
     }
     if(!other.isInfinite) {
-        min = std::min(min,other.data.size());
+        min = std::min(min,(unsigned int)other.data.size());
     }
     std::vector<unsigned char> result;
     for(int i = 0; i < min; i++) {
@@ -134,17 +140,55 @@ DataStream DataStream::operator^(const DataStream &other) const {
     return ds;
 }
 
+std::pair<DataStream,DataStream> DataStream::split(int index) const {
+    DataStream first;
+    first.data = std::vector<unsigned char>(data.begin(),data.begin()+index);
+    DataStream last;
+    last.data = std::vector<unsigned char>(data.begin()+index,data.end());
+    return std::make_pair(first,last);
+}
+
+std::vector<DataStream> DataStream::partition(int index) const {
+    std::vector<std::vector<unsigned char> > part_data;
+    for(int i = 0; i < index; i++) {
+        part_data.push_back(std::vector<unsigned char>());
+    }
+    for(int i = 0; i < data.size(); i++) {
+        part_data[i%index].push_back(data[i]);
+    }
+    std::vector<DataStream> partitions;
+    for(auto &v : part_data) {
+        DataStream d;
+        d.data = v;
+        partitions.push_back(d);
+    }
+    return partitions;
+}
+
+int DataStream::getDistance(const DataStream &other) const {
+    int min = std::min(data.size(),other.data.size());
+    int distance = 0;
+    for(int i = 0; i < min; i++) {
+        for(int j = 0; j < 8; j++) {
+            distance += (((data[i]>>j)&1) == ((other.data[i]>>j)&1))?0:1;
+        }
+    }
+    return distance;
+}
+    
+
+
 double getScoreChar(const unsigned char c) {
     if(c <= 'z' && c >= 'a') {
-        return 2.1;
+        return 3.1;
     } else if(c <= 'Z' && c >= 'A') {
-        return 1.8;
+        return 2.8;
     } else if(c == ' ') {
         return 1.0;
     } else if(c < 0x7f && c > 0x20 || c == '\n' || c == '\r') {
         return 0.1;
     } else {
-        return -5.0;
+        return -50.0;
     }
 }
 

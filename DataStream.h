@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <utility>
 
 #ifndef __Data_Stream
 #define __Data_Stream
@@ -7,7 +8,9 @@ class DataStream {
     std::vector<unsigned char> data;
     bool isInfinite = false;
     public:    
-    void setInfinite()
+    DataStream() {}
+    DataStream(std::vector<unsigned char> d) { data = d; }
+    void setInfinite();
     void setAsciiString(const std::string &ascii);
     void setHexString(const std::string &hex);
     void setBase64String(const std::string &b64);
@@ -20,6 +23,9 @@ class DataStream {
 
     DataStream operator^(const DataStream &other) const;
     double getScore() const;
+    int getDistance(const DataStream &other) const;
+    std::pair<DataStream,DataStream> split(int index) const;
+    std::vector<DataStream> partition(int index) const;
 };
 
 #endif
