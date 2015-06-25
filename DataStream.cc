@@ -4,15 +4,19 @@
 #include <ios>
 #include <sstream>
 
+void DataStream::setInfinite() {
+    isInfinite = true;
+}
+
 void DataStream::setAsciiString(const std::string &ascii) {
-    data = std::vector<unsigned int>();
+    data = std::vector<unsigned char>();
     for(const char &c : ascii) {
         data.push_back(c);
     }
 }
 
 void DataStream::setHexString(const std::string &hex) {
-    data = std::vector<unsigned int>();
+    data = std::vector<unsigned char>();
     for(int i = 0; i < hex.size(); i+= 2) {
         char ans[3];
         ans[2] = '\0';
@@ -26,7 +30,7 @@ void DataStream::setHexString(const std::string &hex) {
     }
 }
 void DataStream::setBase64String(const std::string &b64) {
-    data = std::vector<unsigned int>();
+    data = std::vector<unsigned char>();
     for(int i = 0; i < b64.size(); i+=4) {
         unsigned long part = 0;
         int j;
@@ -55,7 +59,7 @@ void DataStream::setBase64String(const std::string &b64) {
 }
 
 void DataStream::setBinaryString(const std::string &bin) {
-    data = std::vector<unsigned int>();
+    data = std::vector<unsigned char>();
 }
 
 std::string DataStream::getAsciiString() const {
@@ -87,7 +91,7 @@ std::string DataStream::getBase64String() const {
             }
         }
         for(int k = 0; k < j + 1; k++) {
-            unsigned int tmp = part>>(6*(3-k))&63;
+            unsigned char tmp = part>>(6*(3-k))&63;
             if(tmp < 26) {
                 answer.push_back('A'+tmp);
             } else if(tmp < 52) {
@@ -114,9 +118,16 @@ std::string DataStream::getBinaryString() const {
 }
 
 DataStream DataStream::operator^(const DataStream &other) const {
-    std::vector<unsigned int> result;
-    for(int i = 0; i < std::min(data.size(),other.data.size()); i++) {
-        result.push_back(data[i]^other.data[i]);
+    int min = 0;
+    if(!isInfinite) {
+        min = data.size();
+    }
+    if(!other.isInfinite) {
+        min = std::min(min,other.data.size());
+    }
+    std::vector<unsigned char> result;
+    for(int i = 0; i < min; i++) {
+        result.push_back(data[i%data.size()]^other.data[i%other.data.size()]);
     }
     DataStream ds;
     ds.data = result;
