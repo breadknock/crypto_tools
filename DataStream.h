@@ -3,7 +3,7 @@
 
 class DataStream {
     std::vector<unsigned int> data;
-    
+    public:    
     void setAsciiString(const std::string &ascii);
     void setHexString(const std::string &hex);
     void setBase64String(const std::string &b64);
@@ -15,5 +15,5 @@ class DataStream {
     std::string getBinaryString() const;
 
     DataStream operator^(const DataStream &other) const;
-    double getSize() const;
+    double getScore() const;
 };
