@@ -21,11 +21,17 @@ class DataStream {
     std::string getBase64String() const;
     std::string getBinaryString() const;
 
+    std::vector<unsigned char> get_data() const { return data; }
+
     DataStream operator^(const DataStream &other) const;
+    bool operator==(const DataStream &other) const;
     double getScore() const;
     int getDistance(const DataStream &other) const;
     std::pair<DataStream,DataStream> split(int index) const;
+    std::vector<DataStream> chunk(unsigned int length) const;
     std::vector<DataStream> partition(int index) const;
+    DataStream rotate(int index) const;
+    void append(const DataStream &other);
 };
 
 #endif

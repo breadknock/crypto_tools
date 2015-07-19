@@ -140,6 +140,10 @@ DataStream DataStream::operator^(const DataStream &other) const {
     return ds;
 }
 
+bool DataStream::operator==(const DataStream &other) const {
+    return data == other.data;
+}
+
 std::pair<DataStream,DataStream> DataStream::split(int index) const {
     DataStream first;
     first.data = std::vector<unsigned char>(data.begin(),data.begin()+index);
@@ -147,6 +151,21 @@ std::pair<DataStream,DataStream> DataStream::split(int index) const {
     last.data = std::vector<unsigned char>(data.begin()+index,data.end());
     return std::make_pair(first,last);
 }
+
+std::vector<DataStream> DataStream::chunk(unsigned int size) const {
+    std::vector<DataStream> chunks;
+    int i = 0;
+    while(i < data.size()) {
+        std::vector<unsigned char> chunk;
+        for(int j = 0; j < size && (i + j) < data.size(); j++) {
+            chunk.push_back(data[i + j]);
+        }
+        i += size;
+        chunks.push_back(chunk);
+    }
+    return chunks;
+}
+
 
 std::vector<DataStream> DataStream::partition(int index) const {
     std::vector<std::vector<unsigned char> > part_data;
@@ -202,4 +221,20 @@ double DataStream::getScore() const {
         total += getScoreChar(c);
     }
     return total / data.size();
+}
+
+void DataStream::append(const DataStream &other) {
+    data.insert(data.end(),other.data.begin(),other.data.end());
+}
+
+DataStream DataStream::rotate(int shift) const {
+    shift %= data.size();
+    std::vector<unsigned char> new_data;
+    for(int i = shift; i < data.size(); i++) {
+        new_data.push_back(data[i]);
+    }
+    for(int i = 0; i < shift; i++) {
+        new_data.push_back(data[i]);
+    }
+    return DataStream(new_data);
 }
