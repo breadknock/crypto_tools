@@ -217,6 +217,9 @@ DataStream pad(const DataStream &stream) {
 bool check_pad(const DataStream &stream) {
     std::vector<unsigned char> data = stream.get_data();
     unsigned char length = data.back();
+    if(length == 0) {
+        return false;
+    }
     for(int i = 0; i < length; i++) {
         if(data[data.size()-i-1] != length) {
             return false;
