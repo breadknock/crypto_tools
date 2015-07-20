@@ -302,6 +302,36 @@ DataStream aes128_decrypt_cbc(const DataStream &key, DataStream iv, const DataSt
     return unpad(dec);
 }
 
+DataStream aes128_encrypt_ctr(const DataStream &key, const DataStream &nonce, const DataStream &dec) {
+    std::vector<DataStream> chunks = dec.chunk(16);
+    DataStream enc;
+    for(unsigned long i = 0; i < chunks.size(); i++) {
+        std::vector<unsigned char> ctr_data = nonce.get_data();
+        for(int j = 0; j < 8; j++) {
+            ctr_data.push_back((i>>(8*j))&0xff);
+        }
+        DataStream xor_block = aes128_encrypt_block(key,DataStream(ctr_data));
+        enc.append(xor_block ^ chunks[i]);
+    }
+    return enc;
+
+}
+
+
+DataStream aes128_decrypt_ctr(const DataStream &key, const DataStream &nonce, const DataStream &enc) {
+    std::vector<DataStream> chunks = enc.chunk(16);
+    DataStream dec;
+    for(unsigned long i = 0; i < chunks.size(); i++) {
+        std::vector<unsigned char> ctr_data = nonce.get_data();
+        for(int j = 0; j < 8; j++) {
+            ctr_data.push_back((i>>(8*j))&0xff);
+        }
+        DataStream xor_block = aes128_encrypt_block(key,DataStream(ctr_data));
+        dec.append(xor_block ^ chunks[i]);
+    }
+    return dec;
+}
+
 DataStream get_random_key(int length) {
     std::ifstream rand_file("/dev/urandom",std::ios::binary);
     unsigned char* data = new unsigned char[length];
