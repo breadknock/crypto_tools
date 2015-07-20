@@ -19,7 +19,7 @@ void DataStream::setAsciiString(const std::string &ascii) {
 
 void DataStream::setHexString(const std::string &hex) {
     data = std::vector<unsigned char>();
-    for(int i = 0; i < hex.size(); i+= 2) {
+    for(unsigned int i = 0; i < hex.size(); i+= 2) {
         char ans[3];
         ans[2] = '\0';
         ans[0] = hex[i];
@@ -33,7 +33,7 @@ void DataStream::setHexString(const std::string &hex) {
 }
 void DataStream::setBase64String(const std::string &b64) {
     data = std::vector<unsigned char>();
-    for(int i = 0; i < b64.size(); i+=4) {
+    for(unsigned int i = 0; i < b64.size(); i+=4) {
         unsigned long part = 0;
         int j;
         for(j = 0; j < 4; j++) {
@@ -51,6 +51,9 @@ void DataStream::setBase64String(const std::string &b64) {
                 tmp = 63;
             } else if(c == '=') {
                 break;
+            } else {
+                tmp = 64;
+                throw 1;
             }
             part |= tmp<<((3-j)*6);
         }
@@ -82,7 +85,7 @@ std::string DataStream::getHexString() const {
 
 std::string DataStream::getBase64String() const {
     std::string answer;
-    for(int i = 0; i < data.size(); i+=3) {
+    for(unsigned int i = 0; i < data.size(); i+=3) {
         int j;
         unsigned long part = 0;
         for(j = 0; j < 3; j++) {
@@ -132,7 +135,7 @@ DataStream DataStream::operator^(const DataStream &other) const {
         min = std::min(min,(unsigned int)other.data.size());
     }
     std::vector<unsigned char> result;
-    for(int i = 0; i < min; i++) {
+    for(unsigned int i = 0; i < min; i++) {
         result.push_back(data[i%data.size()]^other.data[i%other.data.size()]);
     }
     DataStream ds;
@@ -154,10 +157,10 @@ std::pair<DataStream,DataStream> DataStream::split(int index) const {
 
 std::vector<DataStream> DataStream::chunk(unsigned int size) const {
     std::vector<DataStream> chunks;
-    int i = 0;
+    unsigned int i = 0;
     while(i < data.size()) {
         std::vector<unsigned char> chunk;
-        for(int j = 0; j < size && (i + j) < data.size(); j++) {
+        for(unsigned int j = 0; j < size && (i + j) < data.size(); j++) {
             chunk.push_back(data[i + j]);
         }
         i += size;
@@ -172,7 +175,7 @@ std::vector<DataStream> DataStream::partition(int index) const {
     for(int i = 0; i < index; i++) {
         part_data.push_back(std::vector<unsigned char>());
     }
-    for(int i = 0; i < data.size(); i++) {
+    for(unsigned int i = 0; i < data.size(); i++) {
         part_data[i%index].push_back(data[i]);
     }
     std::vector<DataStream> partitions;
@@ -204,7 +207,7 @@ double getScoreChar(const unsigned char c) {
         return 2.8;
     } else if(c == ' ') {
         return 1.0;
-    } else if(c < 0x7f && c > 0x20 || c == '\n' || c == '\r') {
+    } else if((c < 0x7f && c > 0x20) || c == '\n' || c == '\r') {
         return 0.1;
     } else {
         return -50.0;
@@ -230,7 +233,7 @@ void DataStream::append(const DataStream &other) {
 DataStream DataStream::rotate(int shift) const {
     shift %= data.size();
     std::vector<unsigned char> new_data;
-    for(int i = shift; i < data.size(); i++) {
+    for(unsigned int i = shift; i < data.size(); i++) {
         new_data.push_back(data[i]);
     }
     for(int i = 0; i < shift; i++) {
