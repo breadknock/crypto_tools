@@ -70,9 +70,9 @@ unsigned char gmul(unsigned char c, unsigned char c2) {
 std::vector<unsigned char> gmmul(std::vector<unsigned char> a, 
                                  std::vector<std::vector<unsigned char> > b) {
     std::vector<unsigned char> ans;
-    for(int i = 0; i < b[0].size(); i++) {
+    for(unsigned int i = 0; i < b[0].size(); i++) {
         unsigned char result = 0;
-        for(int j = 0; j < a.size(); j++) {
+        for(unsigned int j = 0; j < a.size(); j++) {
             result ^= gmul(a[j],b[i][j]);
         }
         ans.push_back(result);
@@ -227,6 +227,11 @@ bool check_pad(const DataStream &stream) {
     }
     return true;
 }
+DataStream unpad(const DataStream &stream) {
+    std::vector<unsigned char> data = stream.get_data();
+    unsigned char length = data.back();
+    return DataStream(std::vector<unsigned char>(data.begin(), data.end()-length));
+}
 
 DataStream aes128_encrypt_block(DataStream key, DataStream block) {
     std::vector<DataStream> key_exp = aes_expand_key(key);
@@ -294,7 +299,7 @@ DataStream aes128_decrypt_cbc(const DataStream &key, DataStream iv, const DataSt
     if(!check_pad(dec)) {
         throw 1;
     }
-    return dec;
+    return unpad(dec);
 }
 
 DataStream get_random_key(int length) {
