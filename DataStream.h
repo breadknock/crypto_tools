@@ -10,6 +10,7 @@ class DataStream {
     public:    
     DataStream() {}
     DataStream(std::vector<unsigned char> d) { data = d; }
+    DataStream(const DataStream &ds) { data = std::vector<unsigned char>(ds.data); }
     void setInfinite();
     void setAsciiString(const std::string &ascii);
     void setHexString(const std::string &hex);

@@ -2,6 +2,7 @@
 #include "DataStream.h"
 #include <vector>
 #include <fstream>
+#include <iostream>
 
 // Thanks, Wikipedia!
 
@@ -205,7 +206,7 @@ DataStream addRoundKey(DataStream block, DataStream key) {
 }
 
 DataStream pad(const DataStream &stream) {
-    unsigned char pad = 15 - (stream.get_data().size()-1)%16;
+    unsigned char pad = 16 - stream.get_data().size()%16;
     std::vector<unsigned char> data = stream.get_data();
     for(int i = 0; i < pad; i++) {
         data.push_back(pad);
@@ -213,6 +214,16 @@ DataStream pad(const DataStream &stream) {
     return DataStream(data);
 }
 
+bool check_pad(const DataStream &stream) {
+    std::vector<unsigned char> data = stream.get_data();
+    unsigned char length = data.back();
+    for(int i = 0; i < length; i++) {
+        if(data[data.size()-i-1] != length) {
+            return false;
+        }
+    }
+    return true;
+}
 
 DataStream aes128_encrypt_block(DataStream key, DataStream block) {
     std::vector<DataStream> key_exp = aes_expand_key(key);
@@ -258,7 +269,7 @@ DataStream aes128_decrypt_ecb(const DataStream &key, const DataStream &enc) {
     return dec;
 }
 
-DataStream aes128_encrypt_cbc(const DataStream &key, DataStream &iv, const DataStream &dec) {
+DataStream aes128_encrypt_cbc(const DataStream &key, DataStream iv, const DataStream &dec) {
     std::vector<DataStream> chunks = pad(dec).chunk(16);
     DataStream enc;
     for(const DataStream &ds : chunks) {
@@ -269,13 +280,16 @@ DataStream aes128_encrypt_cbc(const DataStream &key, DataStream &iv, const DataS
     return enc;
 }
 
-DataStream aes128_decrypt_cbc(const DataStream &key, DataStream &iv, const DataStream &enc) {
+DataStream aes128_decrypt_cbc(const DataStream &key, DataStream iv, const DataStream &enc) {
     std::vector<DataStream> chunks = enc.chunk(16);
     DataStream dec;
     for(const DataStream &ds : chunks) {
         DataStream dec_block = iv^aes128_decrypt_block(key,ds);
         dec.append(dec_block);
         iv = ds;
+    }
+    if(!check_pad(dec)) {
+        throw 1;
     }
     return dec;
 }
