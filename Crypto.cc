@@ -338,6 +338,7 @@ DataStream get_random_key(int length) {
     rand_file.read((char*)data, length);
     DataStream ds(std::vector<unsigned char>(data,data + length));
     delete[] data;
+    rand_file.close();
     return ds;
 }
 
