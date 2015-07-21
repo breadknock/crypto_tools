@@ -37,6 +37,7 @@ private:
 public:
     Twister(uint32_t seed);
     uint32_t get_random();
+    void set_state(std::vector<uint32_t> new_state) { state = new_state; index = VECTOR_SIZE; }
 };
 
 #endif
