@@ -207,7 +207,7 @@ DataStream addRoundKey(DataStream block, DataStream key) {
 }
 
 DataStream pad(const DataStream &stream) {
-    unsigned char pad = 16 - stream.get_data().size()%16;
+    unsigned char pad = 16 - stream.get_size()%16;
     std::vector<unsigned char> data = stream.get_data();
     for(int i = 0; i < pad; i++) {
         data.push_back(pad);
