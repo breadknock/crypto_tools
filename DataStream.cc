@@ -241,3 +241,7 @@ DataStream DataStream::rotate(int shift) const {
     }
     return DataStream(new_data);
 }
+
+unsigned int DataStream::get_size() const {
+    return data.size();
+}

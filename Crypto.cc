@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 // Thanks, Wikipedia!
 
@@ -317,6 +318,24 @@ DataStream aes128_encrypt_ctr(const DataStream &key, const DataStream &nonce, co
 
 }
 
+void aes128_edit_ctr(const DataStream &key, const DataStream &nonce, DataStream &enc, const DataStream &new_text, unsigned long offset) {
+    std::vector<unsigned char> enc_data = enc.get_data();
+    std::vector<unsigned char> new_data = new_text.get_data();
+    for(unsigned long i = offset / 16; i <= (offset - 1 + new_data.size())/16; i++) {
+        std::cout<<i<<std::endl;
+        std::vector<unsigned char> ctr_data = nonce.get_data();
+        for(int j = 0; j < 8; j++) {
+            ctr_data.push_back((i>>(8*j))&0xff);
+        }
+        std::vector<unsigned char> xor_block = aes128_encrypt_block(key,DataStream(ctr_data)).get_data();
+        unsigned long start = std::max((i*16),offset);
+        unsigned long end = std::min((i+1)*16,offset + new_text.get_size());
+        for(;start < end; start++) {
+            enc_data[start] = xor_block[start%16] ^ new_data[start - offset];
+        }
+    }
+    enc = DataStream(enc_data);
+}
 
 DataStream aes128_decrypt_ctr(const DataStream &key, const DataStream &nonce, const DataStream &enc) {
     std::vector<DataStream> chunks = enc.chunk(16);
