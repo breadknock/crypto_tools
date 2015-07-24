@@ -8,7 +8,7 @@ uint32_t rotl(uint32_t x, int shift) {
     return (x << shift) | (x >> (32 - shift));
 }
 
-void iterate_hash(const DataStream &block, std::vector<uint32_t> hashes) {
+void iterate_hash(const DataStream &block, std::vector<uint32_t> &hashes) {
     std::vector<DataStream> key_blocks = block.chunk(4);
     std::vector<uint32_t> keys;
     for(int i = 0; i < 16; i++) {
