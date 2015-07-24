@@ -11,6 +11,4 @@ DataStream aes128_decrypt_cbc(const DataStream &key, DataStream iv, const DataSt
 DataStream aes128_encrypt_ctr(const DataStream &key, const DataStream &nonce, const DataStream &dec);
 void aes128_edit_ctr(const DataStream &key, const DataStream &nonce, DataStream &enc, const DataStream &new_text, unsigned long offset);
 DataStream aes128_decrypt_ctr(const DataStream &key, const DataStream &nonce, const DataStream &enc);
-DataStream get_random_key(int length = 16);
-
 #endif

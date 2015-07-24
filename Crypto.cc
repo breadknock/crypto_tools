@@ -1,7 +1,6 @@
 #include "Crypto.h"
 #include "DataStream.h"
 #include <vector>
-#include <fstream>
 #include <iostream>
 #include <algorithm>
 
@@ -350,14 +349,3 @@ DataStream aes128_decrypt_ctr(const DataStream &key, const DataStream &nonce, co
     }
     return dec;
 }
-
-DataStream get_random_key(int length) {
-    std::ifstream rand_file("/dev/urandom",std::ios::binary);
-    unsigned char* data = new unsigned char[length];
-    rand_file.read((char*)data, length);
-    DataStream ds(std::vector<unsigned char>(data,data + length));
-    delete[] data;
-    rand_file.close();
-    return ds;
-}
-

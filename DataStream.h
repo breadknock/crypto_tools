@@ -36,4 +36,5 @@ class DataStream {
     unsigned int get_size() const;
 };
 
+DataStream get_random_key(int length=16);
 #endif

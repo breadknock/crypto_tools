@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iomanip>
 #include <utility>
+#include <fstream>
 
 void DataStream::setInfinite() {
     isInfinite = true;
@@ -244,4 +245,14 @@ DataStream DataStream::rotate(int shift) const {
 
 unsigned int DataStream::get_size() const {
     return data.size();
+}
+
+DataStream get_random_key(int length) {
+    std::ifstream rand_file("/dev/urandom",std::ios::binary);
+    unsigned char* data = new unsigned char[length];
+    rand_file.read((char*)data, length);
+    DataStream ds(std::vector<unsigned char>(data,data + length));
+    delete[] data;
+    rand_file.close();
+    return ds;
 }
