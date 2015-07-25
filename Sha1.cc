@@ -68,6 +68,7 @@ void iterate_hash(const DataStream &block, std::vector<uint32_t> &hashes) {
 }
 
 
+
 DataStream sha1_hash(const DataStream &message) {
     std::vector<unsigned char> data = message.get_data();
     uint64_t length = data.size();
@@ -105,4 +106,17 @@ DataStream sha1_hash(const DataStream &message) {
 DataStream sha1_hash_with_key(DataStream key, const DataStream &message) {
     key.append(message);
     return sha1_hash(key);
+}
+
+DataStream sha1_hmac_hash(const DataStream &key, const DataStream &message) {
+    DataStream opad(std::vector<unsigned char>(1,0x5C));
+    opad.setInfinite();
+    DataStream ipad(std::vector<unsigned char>(1,0x36));
+    ipad.setInfinite();
+    DataStream working = key ^ ipad;
+    working.append(message);
+    working = sha1_hash(working);
+    DataStream result = key ^ opad;
+    result.append(working);
+    return sha1_hash(result);
 }
