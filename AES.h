@@ -1,8 +1,8 @@
 #include <vector>
 #include "DataStream.h"
 
-#ifndef __crypto__h
-#define __crypto__h
+#ifndef __aes__h
+#define __aes__h
 
 DataStream aes128_encrypt_ecb(const DataStream &key, const DataStream &dec);
 DataStream aes128_decrypt_ecb(const DataStream &key, const DataStream &enc);
