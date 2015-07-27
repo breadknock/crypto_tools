@@ -321,7 +321,6 @@ void aes128_edit_ctr(const DataStream &key, const DataStream &nonce, DataStream 
     std::vector<unsigned char> enc_data = enc.get_data();
     std::vector<unsigned char> new_data = new_text.get_data();
     for(unsigned long i = offset / 16; i <= (offset - 1 + new_data.size())/16; i++) {
-        std::cout<<i<<std::endl;
         std::vector<unsigned char> ctr_data = nonce.get_data();
         for(int j = 0; j < 8; j++) {
             ctr_data.push_back((i>>(8*j))&0xff);
