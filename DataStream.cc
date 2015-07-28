@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <utility>
 #include <fstream>
+#include <iostream>
 
 void DataStream::setInfinite() {
     isInfinite = true;
@@ -106,7 +107,7 @@ std::string DataStream::getBase64String() const {
                 answer.push_back('0'+(tmp-52));
             } else if(tmp == 62) {
                 answer.push_back('+');
-            } else if(tmp == 62) {
+            } else if(tmp == 63) {
                 answer.push_back('/');
             }
         }
