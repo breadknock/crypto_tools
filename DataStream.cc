@@ -7,6 +7,8 @@
 #include <utility>
 #include <fstream>
 #include <iostream>
+#include <boost/multiprecision/cpp_int.hpp>
+using boost::multiprecision::cpp_int;
 
 void DataStream::setInfinite() {
     isInfinite = true;
@@ -69,6 +71,18 @@ void DataStream::setBinaryString(const std::string &bin) {
     data = std::vector<unsigned char>();
 }
 
+void DataStream::setCppInt(const cpp_int &cint) {
+    std::stringstream ss;
+    ss << std::hex << cint;
+    std::string hex_int = ss.str();
+    std::string prefix;
+    if(hex_int.size()%2) {
+        prefix = "0";
+    }
+    prefix += hex_int;
+    setHexString(prefix);
+}
+
 std::string DataStream::getAsciiString() const {
     std::string answer;
     for(const unsigned char &c : data) {
@@ -126,6 +140,12 @@ std::string DataStream::getBinaryString() const {
         }
     }
     return answer;
+}
+
+cpp_int DataStream::getCppInt() const {
+    std::string num = "0x";
+    num += getHexString();
+    return cpp_int(num);
 }
 
 DataStream DataStream::operator^(const DataStream &other) const {
