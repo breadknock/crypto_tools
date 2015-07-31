@@ -1,18 +1,12 @@
 #include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/random.hpp>
-#include <boost/multiprecision/integer.hpp>
 #include "DH_Client.h"
 #include "DataStream.h"
 #include <iostream>
-#include <time.h>
 using namespace boost::multiprecision;
-using namespace boost::random;
 
 cpp_int get_random_private_key(cpp_int p) {
-    boost::mt19937 rng(time(NULL));
-    boost::uniform_int<cpp_int> gen(0,pow(cpp_int(2), 1600));
-    cpp_int rand = gen(rng);
-    return powm(rand,cpp_int(1),p);
+    DataStream random_stream = get_random_key(1600 / 8);
+    return random_stream.getCppInt() % p;
 }
 
 DH_Client::DH_Client() {
