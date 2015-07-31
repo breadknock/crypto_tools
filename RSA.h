@@ -1,3 +1,5 @@
+#ifndef __RSA_h
+#define __RSA_h
 #include <boost/multiprecision/cpp_int.hpp>
 #include "DataStream.h"
 #include <utility>
@@ -25,3 +27,4 @@ DataStream encrypt(const DataStream &ds, const RSA_key &key);
 cpp_int inv_mod(const cpp_int &num, const cpp_int &mod);
 
 cpp_int gen_prime(int bit_size, int no_div=0);
+#endif
