@@ -3,7 +3,6 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/miller_rabin.hpp>
 #include <utility>
-#include <iostream>
 using boost::multiprecision::cpp_int;
 
 
@@ -17,7 +16,6 @@ RSAClient::RSAClient(int bit_size, int _e) {
         d = inv_mod(e, toit);
         if(!d) e++;
     } while (d == 0);
-    std::cout<<e<<std::endl;
 }
 
 RSA_key RSAClient::get_public_key() {
