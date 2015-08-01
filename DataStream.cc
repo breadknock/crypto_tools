@@ -252,6 +252,10 @@ void DataStream::append(const DataStream &other) {
     data.insert(data.end(),other.data.begin(),other.data.end());
 }
 
+void DataStream::push_back(unsigned char input) {
+    data.push_back(input);
+}
+
 DataStream DataStream::rotate(int shift) const {
     shift %= data.size();
     std::vector<unsigned char> new_data;

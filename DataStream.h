@@ -39,6 +39,7 @@ class DataStream {
     std::vector<DataStream> partition(int index) const;
     DataStream rotate(int index) const;
     void append(const DataStream &other);
+    void push_back(unsigned char input);
     unsigned int get_size() const;
 };
 
