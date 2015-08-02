@@ -71,16 +71,21 @@ void DataStream::setBinaryString(const std::string &bin) {
     data = std::vector<unsigned char>();
 }
 
-void DataStream::setCppInt(const cpp_int &cint) {
+void DataStream::setCppInt(const cpp_int &cint, size_t len) {
     std::stringstream ss;
     ss << std::hex << cint;
     std::string hex_int = ss.str();
-    std::string prefix;
-    if(hex_int.size()%2) {
-        prefix = "0";
+    if(len == 0)  {
+        len = ((hex_int.size()+1)&(~1))*4;
     }
-    prefix += hex_int;
-    setHexString(prefix);
+    if(hex_int.size()*4 > len) {
+        setHexString(hex_int.substr(hex_int.size() - len / 4));
+
+    } else {
+        std::string prefix((len - hex_int.size()*4)/4, '0');
+        prefix += hex_int;
+        setHexString(prefix);
+    }
 }
 
 std::string DataStream::getAsciiString() const {

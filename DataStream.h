@@ -14,13 +14,13 @@ class DataStream {
     DataStream(std::vector<unsigned char> d) : data(d) {}
     DataStream(std::string s) { setAsciiString(s); }
     DataStream(const DataStream &ds) : data(std::vector<unsigned char>(ds.data)) {}
-    DataStream(const cpp_int &cint) { setCppInt(cint); }
+    DataStream(const cpp_int &cint, size_t len = 0) { setCppInt(cint, len); }
     void setInfinite();
     void setAsciiString(const std::string &ascii);
     void setHexString(const std::string &hex);
     void setBase64String(const std::string &b64);
     void setBinaryString(const std::string &bin);
-    void setCppInt(const cpp_int &cint);
+    void setCppInt(const cpp_int &cint, size_t len);
 
     std::string getAsciiString() const;
     std::string getHexString() const;

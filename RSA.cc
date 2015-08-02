@@ -6,7 +6,8 @@
 using boost::multiprecision::cpp_int;
 
 
-RSAClient::RSAClient(int bit_size, int _e) {
+RSAClient::RSAClient(size_t _bit_size, int _e) {
+    bit_size = _bit_size;
     e = _e;
     cpp_int p = gen_prime(bit_size, _e);
     cpp_int q = gen_prime(bit_size, _e);
@@ -23,11 +24,11 @@ RSA_key RSAClient::get_public_key() {
 }
 
 DataStream RSAClient::decrypt(const DataStream &cipher) {
-    return DataStream(powm(cipher.getCppInt(), d, n));
+    return DataStream(powm(cipher.getCppInt(), d, n), bit_size*2);
 }
 
-DataStream encrypt(const DataStream &ds, const RSA_key &key) {
-    return DataStream(powm(ds.getCppInt(), key.first, key.second));
+DataStream encrypt(const DataStream &ds, const RSA_key &key, size_t bit_size) {
+    return DataStream(powm(ds.getCppInt(), key.first, key.second), bit_size*2);
 }
 
 cpp_int inv_mod(const cpp_int &num, const cpp_int &mod) {
@@ -49,7 +50,7 @@ cpp_int inv_mod(const cpp_int &num, const cpp_int &mod) {
 }
 
 
-cpp_int gen_prime(int bit_size, int no_div) {
+cpp_int gen_prime(size_t bit_size, int no_div) {
     cpp_int prime;
     do {
         if(no_div > 0) {
