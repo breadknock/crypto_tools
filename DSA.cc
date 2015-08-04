@@ -2,26 +2,40 @@
 #include "DataStream.h"
 #include "Sha1.h"
 #include <utility>
+#include <iostream>
 #include <boost/multiprecision/cpp_int.hpp>
 
-DSAClient DSAMaster::generate_client(const cpp_int &x) {
-    if(x == 0) {
-        //generate random number
+cpp_int mod_inv(cpp_int k, cpp_int mod) {
+    return powm(k, mod - 2, mod);
+}
+
+DSAClient DSAMaster::generate_client(cpp_int x) {
+    while(x == 0) {
+        x = get_random_key(msb(q) / 8 + 2).getCppInt() % q;
+        std::cout<<x<<std::endl;
     }
-    return DSAClient(x);
+    return DSAClient(p,q,g,x);
 }
 
 DSAClient::DSAClient(const cpp_int &_p, const cpp_int &_q, const cpp_int &_g, const cpp_int &_x) : p(_p), q(_q), g(_g), x(_x) {
     y = powm(g, x, p);
 }
 
-DSA_Sig DSAClient::sign(const DataStream &msg, const cpp_int &k) {
-    if(k == 0) {
-        k = get_random_key(bit_size / 8)
-        //generate k;
+DSA_Sig DSAClient::sign(const DataStream &msg, cpp_int k) {
+    cpp_int r = 0;
+    cpp_int s = 0;
+    while(r == 0 || s == 0) { 
+        if(k == 0) {
+            unsigned int byte_size = msb(q) / 8 + 2;
+            k = get_random_key(byte_size).getCppInt() % q;
+        }
+        r = (cpp_int)powm(g, k, p) % q;
+        s = x * r;
+        s += sha1_hash(msg).getCppInt();
+        s *= mod_inv(k, q);
+        s %= q;
     }
-    //sign message
-
+    return std::make_pair(r, s);
 }
 
 DSA_key DSAClient::get_public_key() {
@@ -34,11 +48,14 @@ DSA_key DSAClient::get_public_key() {
 }
 
 bool verify(const DSA_key &pub_key, const DSA_Sig &sig, const DataStream &msg) {
-    if(sig.first >= q || sig.second >= q) {
+    if(sig.first >= pub_key.q || sig.second >= pub_key.q) {
         return false;
     }
-    //Finish verification
-
+    cpp_int w = mod_inv(sig.second, pub_key.q);
+    cpp_int u1 = sha1_hash(msg).getCppInt() * (w % pub_key.q);
+    cpp_int u2 = (sig.first * w) % pub_key.q;
+    cpp_int v = ((cpp_int)powm(pub_key.g, u1, pub_key.p) * (cpp_int)powm(pub_key.y, u2, pub_key.p)) % pub_key.p % pub_key.q;
+    return v == sig.first;
 }
 
 DSAMaster create_default_master() {
