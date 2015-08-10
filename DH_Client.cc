@@ -31,12 +31,5 @@ cpp_int DH_Client::get_shared_secret(const cpp_int &other) {
 
 
 DataStream DH_Client::get_shared_secret_data(const cpp_int &other) {
-    cpp_int data = powm(other, private_key, p);
-    std::vector<unsigned char> ans;
-    while(data > 0) {
-        cpp_int and_result = data & 255;
-        ans.push_back(static_cast<unsigned char>(and_result));
-        data >>= 8;
-    }
-    return DataStream(ans);
+    return DataStream(get_shared_secret(other));
 }
