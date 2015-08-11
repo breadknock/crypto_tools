@@ -288,6 +288,14 @@ DataStream aes128_encrypt_cbc(const DataStream &key, DataStream iv, const DataSt
     return enc;
 }
 
+DataStream aes128_cbc_mac(const DataStream &key, DataStream iv, const DataStream &dec) {
+    std::vector<DataStream> chunks = pad(dec).chunk(16);
+    for(const DataStream &ds : chunks) {
+        iv = (aes128_encrypt_block(key,ds^iv));
+    }
+    return iv;
+}
+
 DataStream aes128_decrypt_cbc(const DataStream &key, DataStream iv, const DataStream &enc) {
     std::vector<DataStream> chunks = enc.chunk(16);
     DataStream dec;
