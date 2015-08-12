@@ -174,6 +174,10 @@ bool DataStream::operator==(const DataStream &other) const {
     return data == other.data;
 }
 
+bool DataStream::operator<(const DataStream &other) const {
+    return data < other.data;
+}
+
 std::pair<DataStream,DataStream> DataStream::split(int index) const {
     DataStream first;
     first.data = std::vector<unsigned char>(data.begin(),data.begin()+index);
