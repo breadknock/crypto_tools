@@ -4,6 +4,10 @@
 #ifndef __aes__h
 #define __aes__h
 
+DataStream aes128_encrypt_block(DataStream key, DataStream block);
+DataStream aes128_decrypt_block(DataStream key, DataStream block);
+DataStream pad(const DataStream &stream);
+
 DataStream aes128_encrypt_ecb(const DataStream &key, const DataStream &dec);
 DataStream aes128_decrypt_ecb(const DataStream &key, const DataStream &enc);
 DataStream aes128_encrypt_cbc(const DataStream &key, DataStream iv, const DataStream &dec);
