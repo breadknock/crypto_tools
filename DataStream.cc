@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <random>
 using boost::multiprecision::cpp_int;
 
 void DataStream::setInfinite() {
@@ -282,11 +283,15 @@ unsigned int DataStream::get_size() const {
 }
 
 DataStream get_random_key(int length) {
-    std::ifstream rand_file("/dev/urandom",std::ios::binary);
-    unsigned char* data = new unsigned char[length];
-    rand_file.read((char*)data, length);
+    std::random_device rd;
+    int num_nums = 1 + (length - 1)/sizeof(unsigned int);
+    unsigned int* big_data = new unsigned int[num_nums];
+    for(int i = 0; i < num_nums; i++) {
+        big_data[i] = rd();
+    }
+    unsigned char* data = (unsigned char*)big_data;
+
     DataStream ds(std::vector<unsigned char>(data,data + length));
-    delete[] data;
-    rand_file.close();
+    delete[] big_data;
     return ds;
 }
