@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace boost::multiprecision;
 
-cpp_int get_random_private_key(cpp_int p) {
+cpp_int get_random_private_key(cpp_int p) { // should remove bias, fix size
     DataStream random_stream = get_random_key(1600 / 8);
     return random_stream.getCppInt() % p;
 }
@@ -29,7 +29,10 @@ cpp_int DH_Client::get_shared_secret(const cpp_int &other) {
     return powm(other, private_key, p);
 }
 
-
 DataStream DH_Client::get_shared_secret_data(const cpp_int &other) {
     return DataStream(get_shared_secret(other));
+}
+
+bool DH_Client::verify_private_key(const cpp_int &guess) {
+    return guess == private_key;
 }

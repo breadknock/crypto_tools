@@ -15,6 +15,7 @@ public:
     cpp_int get_base() { return base; }
     cpp_int get_prime() { return p; }
     cpp_int get_public_key();
+    bool verify_private_key(const cpp_int &guess);
     cpp_int get_shared_secret(const cpp_int &other);
     DataStream get_shared_secret_data(const cpp_int &other);
 };
